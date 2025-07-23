@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Job Scraper</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+            rel="stylesheet"
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            body {
+                width: 400px;
+                height: auto;
+                font-family: "Inter", sans-serif;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50 text-gray-800">
+        <!-- Header -->
+        <header class="p-4 border-b border-gray-200 bg-white">
+            <h1 class="text-xl font-bold text-gray-900">Job Scraper</h1>
+        </header>
+
+        <!-- Content Area -->
+        <main class="p-4">
+            <button
+                id="scrapeButton"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105 w-full"
+            >
+                Scrape Job
+            </button>
+            <textarea
+                id="results"
+                class="w-full h-48 p-2 border border-gray-300 rounded mt-4"
+                readonly
+            ></textarea>
+        </main>
+
+        <script src="./popup.js"></script>
+    </body>
+</html>
