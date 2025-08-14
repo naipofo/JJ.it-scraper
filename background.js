@@ -55,43 +55,60 @@ function scrapeJobDetails() {
       return element ? element.getAttribute(attribute) : "";
     };
 
-    const imageUrl = getElementAttribute("img#offerCardCompanyLogo", "src");
-    const companyName = getElementText("h2.mui-7mkjdj");
-    const companyLocation = getElementText("span.mui-1o4wo1x");
-    const jobRole = getElementText("h1.mui-qnzs6x");
+    const imageUrl = getElementAttribute("object#offerCardCompanyLogo", "data");
+    const companyName = getElementText(".mui-3utbbt a p.mui-1vn2m4l");
+
+    // The first p tag in this div is the address.
+    const locationElement = document.querySelector(
+      ".mui-3utbbt > p.mui-1vn2m4l",
+    );
+    const locationText = locationElement
+      ? locationElement.textContent.trim()
+      : "";
+    const city = locationText.split(",").pop().trim();
+
+    let remoteStatus = "";
+    const detailElements = document.querySelectorAll(".mui-1hp3r0f");
+    if (detailElements.length > 0) {
+      // Last detail item is the work mode (Hybrid, Remote, etc.)
+      remoteStatus =
+        detailElements[detailElements.length - 1].textContent.trim();
+      // The sample output uses "Fully remote" for "Remote"
+      if (remoteStatus.toLowerCase() === "remote") {
+        remoteStatus = "Fully remote";
+      }
+    }
+
+    const companyLocation = [city, remoteStatus].filter(Boolean).join(", ");
+
+    const jobRole = getElementText("h1.mui-5hfn3u");
     const jobLink = window.location.href;
 
     let bottomBracket = "";
     let topBracket = "";
 
-    // Find all salary elements and iterate through them
-    const salaryElements = document.querySelectorAll(".mui-1km0bek");
+    const salaryContainer = document.querySelector(".mui-lvf5qk");
+    if (salaryContainer) {
+      const salarySpans = salaryContainer.querySelectorAll("h6 > span");
+      if (salarySpans.length >= 2) {
+        let val1 = parseFloat(salarySpans[0].textContent.replace(/\s/g, ""));
+        let val2 = parseFloat(salarySpans[1].textContent.replace(/\s/g, ""));
 
-    for (const element of salaryElements) {
-      const textContent = element.textContent;
-      if (!textContent) continue;
+        const periodTextElement = salaryContainer.querySelector(".mui-ktaxaz");
+        const periodText = periodTextElement
+          ? periodTextElement.textContent.toLowerCase()
+          : "";
 
-      // Regex to find numbers and period (h, day, month)
-      const salaryRegex = /(\d[\d\s]*)\s*-\s*(\d[\d\s]*)\s*PLN\/(h|day|month)/i;
-      const match = textContent.match(salaryRegex);
-
-      if (match) {
-        let val1 = parseFloat(match[1].replace(/\s/g, ""));
-        let val2 = parseFloat(match[2].replace(/\s/g, ""));
-        const period = match[3].toLowerCase();
-
-        if (period === "day") {
+        if (periodText.includes("day")) {
           val1 *= 20; // 20 working days/month
           val2 *= 20;
-        } else if (period === "h") {
-          val1 *= 160; // 160 working hours/month (40h/week * 4 weeks)
+        } else if (periodText.includes("hour") || periodText.includes("/h")) {
+          val1 *= 160; // 160 working hours/month
           val2 *= 160;
         }
-        // No conversion needed for 'month'
 
         bottomBracket = val1.toString();
         topBracket = val2.toString();
-        break; // Stop after finding the first valid salary
       }
     }
 
